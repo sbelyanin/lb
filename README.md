@@ -24,6 +24,10 @@ vagrant plugin install vagrant-libvirt
 ```bash
 vagrant plugin list
 vagrant-libvirt (0.1.2, global)
+
 virsh --version
 4.5.0
+
+virsh nodeinfo
 ```
+
