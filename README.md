@@ -3,10 +3,15 @@ devops-test
 
 ![](schema.png)
 
-## Настрока среды вирталзации
+## Настрока среды виртуализации
 - Установка centos 7
 - Установка ansible
-
+```bash
+yum install epel-release
+yum install ansible
+ansible --version
+"ansible 2.9.10"
+```
 ## Установка vagrant и Libvirt
 
 ```bash
@@ -25,10 +30,10 @@ vagrant plugin install vagrant-libvirt
 
 ```bash
 vagrant plugin list
-vagrant-libvirt (0.1.2, global)
+"vagrant-libvirt (0.1.2, global)"
 
 virsh --version
-4.5.0
+"4.5.0"
 
 virsh nodeinfo
 ```
