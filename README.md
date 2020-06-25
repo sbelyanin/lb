@@ -19,7 +19,7 @@ rpm -i vagrant_2.2.9_x86_64.rpm
 vagrant plugin install vagrant-libvirt
 ```
 
-## проверка что все установилось коректно
+## Проверка что все установилось коректно
 
 ```bash
 vagrant plugin list
