@@ -1,6 +1,8 @@
 # lb
 devops-test
 
+![](schema.png)
+
 ## Настрока среды вирталзации
 - Установка centos 7
 - Установка ansible
