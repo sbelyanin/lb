@@ -1,0 +1,5 @@
+---
+service_name: "proxy-nginx"
+service_image: "jwilder/nginx-proxy"
+service_dir: "{{ docker_services_dir }}/{{ service_name }}"
+

@@ -1,0 +1,5 @@
+---
+service_name: "odfe"
+service_image: "amazon/opendistro-for-elasticsearch:1.1.0"
+service_dir: "{{ docker_services_dir }}/{{ service_name }}"
+es_external_url: "es.wowservice.info"

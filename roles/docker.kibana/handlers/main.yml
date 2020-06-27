@@ -1,0 +1,13 @@
+---
+ - name: restart {{ service_branch }}-{{ service_name }}
+   docker_compose:
+     project_src: "{{ service_dir }}"
+     services: "{{ service_branch }}-{{ service_name }}"
+     state: present
+
+ - name: up {{ service_branch }}-{{ service_name }}
+   docker_compose:
+     project_src: "{{ service_dir }}"
+     services: "{{ service_branch }}-{{ service_name }}"
+     restarted: yes
+

@@ -1,0 +1,54 @@
+version: '2.4'
+
+networks:
+    proxy-re-net:
+      external:
+        name: proxy-re-net
+
+services:
+ {{ service_branch }}-{{ service_name }}:
+  image: {{ service_image }}
+  restart: always
+  container_name: {{ service_branch }}-{{ service_name }}
+  mem_limit: 200m
+  labels:
+    - "local.env={{ service_branch }}"
+    - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+  ports:
+    - 80:80
+    - 443:443
+  expose:
+    - "80"
+    - "443"
+  volumes:
+    - ./vhost.d:/etc/nginx/vhost.d
+    - ./htpasswd:/etc/nginx/htpasswd
+    - ./conf.d:/etc/nginx/conf.d
+    - ./html:/usr/share/nginx/html
+    - /var/run/docker.sock:/tmp/docker.sock:ro
+    - ./certs:/etc/nginx/certs:rw
+  networks:
+    proxy-re-net:
+  logging:
+    driver: json-file
+    options:
+       labels: "com.docker.compose.service"
+
+ {{ service_branch }}-{{ service_name }}-compan:
+  image: jrcs/letsencrypt-nginx-proxy-companion:v1.11
+  restart: always
+  container_name: {{ service_branch }}-{{ service_name }}-compan
+  mem_limit: 100m
+  labels:
+    - "local.env={{ service_branch }}"
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+  volumes_from:
+    - {{ service_branch }}-{{ service_name }}
+  networks:
+    proxy-re-net:
+  logging:
+    driver: json-file
+    options:
+       labels: "com.docker.compose.service"
+

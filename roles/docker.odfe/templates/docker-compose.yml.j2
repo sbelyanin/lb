@@ -1,0 +1,44 @@
+version: '2.4'
+
+networks:
+    proxy-re-net:
+      external:
+        name: proxy-re-net
+
+services:
+ {{ service_branch }}-{{ service_name }}:
+  image: {{ service_image }}
+  restart: always
+  container_name: {{ service_branch }}-{{ service_name }}
+  mem_limit: 6000m
+  labels:
+    - "local.env={{ service_branch }}"
+  environment:
+    - bootstrap.memory_lock=true
+    - "ES_JAVA_OPTS=-Xms2024m -Xmx2024m"
+    - discovery.type=single-node
+    - network.host=0.0.0.0
+    - opendistro_security.ssl.http.enabled=false
+    - VIRTUAL_HOST={{ es_external_url }}
+    - LETSENCRYPT_HOST={{ es_external_url }}
+    - LETSENCRYPT_EMAIL=admin@{{ es_external_url }}
+    - VIRTUAL_PORT=9200
+  volumes:
+    - ./odfe.data:/usr/share/elasticsearch/data
+    - ./odfe.users.yml:/usr/share/elasticsearch/plugins/opendistro_security/securityconfig/internal_users.yml
+  ulimits:
+    memlock:
+      soft: -1
+      hard: -1
+  networks:
+    proxy-re-net:
+      aliases:
+        - {{ service_name }}
+  expose:
+    - 9200
+    - 9600
+  logging:
+    driver: json-file
+    options:
+       labels: "com.docker.compose.service"
+

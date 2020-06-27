@@ -1,0 +1,27 @@
+---
+ - name: Install EPEL release
+   become: true
+   become_user: root
+   yum:
+     pkg: epel-release
+     state: present
+   when:
+     - ansible_os_family == "RedHat"
+     - install_epel|bool
+   tags: 
+     - host.packages
+     - install
+     - update
+
+ - name: Installing helpful tools and packages
+   become: true
+   become_user: root
+   yum:
+     pkg: "{{ packages }}"
+     state: present
+   when:
+     - ansible_os_family == "RedHat"
+   tags: 
+     - host.packages
+     - install
+     - update

@@ -1,0 +1,8 @@
+---
+- name: Install and configure stuff 
+  hosts: lb
+  become: true
+  vars_files:
+    - "../vars/docker.yml"
+  roles
+     - role: host.packages

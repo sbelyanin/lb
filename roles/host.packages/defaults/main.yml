@@ -1,0 +1,15 @@
+---
+install_epel: true
+packages:
+  - vim
+  - git
+  - tcpdump
+  - mc
+  - curl
+  - nano
+  - psmisc
+#  - python2-pip
+#  - python-requests
+#  - python-six
+#  - python-urllib3
+

@@ -1,0 +1,6 @@
+---
+service_name: "kibana"
+service_image: "amazon/opendistro-for-elasticsearch-kibana:1.1.0"
+service_dir: "{{ docker_services_dir }}/{{ service_name }}"
+kibana_external_url: "kibana.wowservice.info"
+es_external_url: "infra-odfe"

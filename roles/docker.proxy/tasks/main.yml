@@ -1,0 +1,116 @@
+---
+  - name: Create dir for {{ service_branch }}-{{ service_name }}
+    become: true
+    become_user: root
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0700
+    with_items:
+      - "{{ service_dir }}"
+    tags: 
+      - docker.proxy-nginx
+      - install
+      - update
+
+  - name: Create dir for {{ service_branch }}-{{ service_name }}
+    become: true
+    become_user: root
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0755
+    with_items:
+      - "{{ service_dir }}/htpasswd"
+      - "{{ service_dir }}/conf.d"
+    tags:
+      - docker.proxy-nginx
+      - install
+      - update
+
+  - name: Copy {{ service_branch }}-{{ service_name }} docker-compose file
+    template:
+      src: docker-compose.yml.j2
+      dest: "{{ service_dir }}/docker-compose.yml"
+      owner: root
+      group: root
+      mode: 0600
+    notify: up {{ service_branch }}-{{ service_name }}
+    tags: 
+      - docker.proxy-nginx
+      - install
+      - update
+
+  - name: Copy {{ service_branch }}-{{ service_name }} htpasswd config files
+    copy:
+      src: "{{ item }}"
+      dest: "{{ service_dir }}/htpasswd/{{ item | basename }}"
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart {{ service_branch }}-{{ service_name }}
+    with_fileglob:
+      - "{{ role_path }}/files/htpasswd/*"
+    tags:
+      - docker.proxy-nginx
+      - install
+      - update
+
+  - name: Copy {{ service_branch }}-{{ service_name }} custom config files
+    copy:
+      src: "{{ item }}"
+      dest: "{{ service_dir }}/conf.d/{{ item | basename }}"
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart {{ service_branch }}-{{ service_name }}
+    with_fileglob:
+      - "{{ role_path }}/files/conf.d/*"
+    tags:
+      - docker.proxy-nginx
+      - install
+      - update
+
+
+
+  - name: up docker {{ service_branch }}-{{ service_name }}
+    docker_compose:
+      project_src: "{{ service_dir }}"
+      services: "{{ service_branch }}-{{ service_name }}"
+      state: present
+    tags:
+      - never
+      - docker.proxy-nginx.up
+      - up
+
+  - name: restart docker {{ service_branch }}-{{ service_name }}
+    docker_compose:
+      project_src: "{{ service_dir }}"
+      services: "{{ service_branch }}-{{ service_name }}"
+      restarted: yes
+    tags:
+      - never
+      - docker.proxy-nginx.restart
+      - restart    
+
+  - name: pull docker images {{ service_branch }}-{{ service_name }}
+    docker_compose:
+      project_src: "{{ service_dir }}"
+      services: "{{ service_branch }}-{{ service_name }}"
+      pull: yes
+      state: present
+    tags:
+      - never
+      - docker.proxy-nginx.pull
+      - pull
+
+  - name: stop docker {{ service_branch }}-{{ service_name }}
+    docker_compose:
+      project_src: "{{ service_dir }}"
+      services: "{{ service_branch }}-{{ service_name }}"
+      state: absent
+    tags:
+      - never
+      - docker.proxy-nginx.down
+      - down
+

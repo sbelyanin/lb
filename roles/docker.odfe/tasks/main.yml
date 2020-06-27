@@ -1,0 +1,111 @@
+---
+  - name: Create dir for {{ service_branch }}-{{ service_name }}
+    become: true
+    become_user: root
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0700
+    with_items:
+      - "{{ service_dir }}"
+    tags: 
+      - docker.odfe
+      - install
+      - update
+
+  - name: Create dir for {{ service_branch }}-{{ service_name }}
+    become: true
+    become_user: root
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0777
+    with_items:
+      - "{{ service_dir }}/odfe.data"
+    tags:
+      - docker.odfe
+      - install
+      - update
+
+  - name: Copy {{ service_branch }}-{{ service_name }} docker-compose file
+    template:
+      src: docker-compose.yml.j2
+      dest: "{{ service_dir }}/docker-compose.yml"
+      owner: root
+      group: root
+      mode: 0600
+    notify: up {{ service_branch }}-{{ service_name }}
+    tags: 
+      - docker.odfe
+      - install
+      - update
+
+  - name: Copy config files
+    template:
+      src: "{{ item }}"
+      dest: "{{ service_dir }}/{{ item | basename | regex_replace('.j2','') }}"
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart {{ service_branch }}-{{ service_name }}
+    with_items:
+      - "{{ role_path }}/templates/odfe.users.yml.j2"
+    tags:
+      - docker.odfe
+      - install
+      - update
+
+  - name: Copy start ES DB files
+    copy:
+      src: "{{ item }}"
+      dest: "{{ service_dir }}/odfe.data/{{ item | basename }}"
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart {{ service_branch }}-{{ service_name }}
+    with_fileglob:
+      - "{{ role_path }}/files/odfe.data/*"
+    tags:
+      - never
+      - docker.odfe.install
+
+  - name: up docker {{ service_branch }}-{{ service_name }}
+    docker_compose:
+      project_src: "{{ service_dir }}"
+      services: "{{ service_branch }}-{{ service_name }}"
+      state: present
+    tags:
+      - never
+      - docker.odfe.up
+      - up
+
+  - name: restart docker {{ service_branch }}-{{ service_name }}
+    docker_compose:
+      project_src: "{{ service_dir }}"
+      services: "{{ service_branch }}-{{ service_name }}"
+      restarted: yes
+    tags:
+      - never
+      - docker.odfe.restart
+      - restart    
+
+  - name: pull docker images {{ service_branch }}-{{ service_name }}
+    docker_compose:
+      project_src: "{{ service_dir }}"
+      services: "{{ service_branch }}-{{ service_name }}"
+      pull: yes
+      state: present
+    tags:
+      - never
+      - docker.odfe.pull
+      - pull
+
+  - name: stop docker {{ service_branch }}-{{ service_name }}
+    docker_compose:
+      project_src: "{{ service_dir }}"
+      services: "{{ service_branch }}-{{ service_name }}"
+      state: absent
+    tags:
+      - never
+      - docker.odfe.down
+      - down
