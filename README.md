@@ -36,5 +36,7 @@ virsh --version
 "4.5.0"
 
 virsh nodeinfo
+
+dmesg | grep kvm
 ```
 
